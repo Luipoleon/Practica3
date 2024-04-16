@@ -62,7 +62,7 @@ def train_network(network, inputs, expected_outputs, learning_rate, epochs):
 # Ejemplo de uso
 if __name__ == "__main__":
     # Definir la estructura de la red neuronal
-    layers = [2, 4, 1]  # Dos neuronas en la capa de entrada, cuatro en la capa oculta y una en la capa de salida
+    layers = [2, 16, 1]  # Dos neuronas en la capa de entrada, cuatro en la capa oculta y una en la capa de salida
     dataset = pd.read_csv("concentlite.csv")
     # Inicializar la red neuronal
     network = init_network(layers)
@@ -75,25 +75,23 @@ if __name__ == "__main__":
 
     # Entrenar la red neuronal
     learning_rate = 0.5
-    epochs = 300
+    epochs = 1000
     train_network(network, inputs, expected_outputs, learning_rate, epochs)
 
-    # Probar la red neuronal
-    for i in range(len(inputs)):
-        outputs = forward_propagation(network, np.array(inputs[i], ndmin=2))
-        print(f"Input: {inputs[i]}, Output: {outputs}")
-
-    # Probar la red neuronal
+    ## Probar la red neuronal
     outputs = []
     for i in range(len(inputs)):
         output = forward_propagation(network, np.array(inputs[i], ndmin=2))
         print(f"Input: {inputs[i]}, Output: {output}")
         outputs.append(output)
 
-    outputs = np.array(outputs).flatten()
+   # Cambia la forma de 'outputs' para que tenga la misma longitud que 'inputs'
+    outputs = np.resize(outputs, (len(inputs),))
+    # Aplica una función de umbral a 'outputs'
+    outputs = np.where(outputs < 0.5, 0, 1)
 
     # Graficar los resultados
-    plt.scatter(inputs[:, 0], inputs[:, 1], c=outputs, cmap='coolwarm')
+    plt.scatter(inputs[:, 0], inputs[:, 1], c=outputs.flatten(), cmap='coolwarm', vmin=0, vmax=1)
     plt.xlabel('Input 1')
     plt.ylabel('Input 2')
     plt.title('Neural Network Output')
